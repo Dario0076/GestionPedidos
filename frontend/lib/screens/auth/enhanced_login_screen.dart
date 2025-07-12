@@ -28,7 +28,7 @@ class _EnhancedLoginScreenState extends ConsumerState<EnhancedLoginScreen>
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _isObscured = true;
+  final bool _isObscured = true;
   bool _isLoading = false;
 
   late AnimationController _animationController;
@@ -129,11 +129,7 @@ class _EnhancedLoginScreenState extends ConsumerState<EnhancedLoginScreen>
   }
 
   void _fillTestData() {
-    setState(() {
-      _emailController.text = 'admin@test.com';
-      _passwordController.text = 'admin123';
-    });
-    ref.read(accessibilityProviderNotifier).provideSelectionFeedback();
+    // Eliminado: función de autollenado de datos de prueba
   }
 
   @override
@@ -194,7 +190,7 @@ class _EnhancedLoginScreenState extends ConsumerState<EnhancedLoginScreen>
                               style: Theme.of(context).textTheme.headlineMedium
                                   ?.copyWith(
                                     fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).primaryColor,
+                        // Eliminado: Widget de estado de conexión
                                     fontSize: ScreenSize.responsiveFontSize(
                                       context,
                                       mobile: 24,
@@ -217,19 +213,12 @@ class _EnhancedLoginScreenState extends ConsumerState<EnhancedLoginScreen>
 
                       const SizedBox(height: 40),
 
-                      // Widget de estado de conexión
-                      AnimatedCard(
-                        delay: const Duration(milliseconds: 300),
-                        child: const ConnectionStatusWidget(),
-                      ),
+                      // Eliminado: Widget de estado de conexión
 
                       const SizedBox(height: 24),
 
                       // Formulario de login animado
-                      AnimatedCard(
-                        delay: const Duration(milliseconds: 400),
-                        child: Form(
-                          key: _formKey,
+                        // Eliminado: Botones de prueba (solo en debug)
                           child: Column(
                             children: [
                               AccessibleTextField(
@@ -242,110 +231,6 @@ class _EnhancedLoginScreenState extends ConsumerState<EnhancedLoginScreen>
                                     return 'El correo electrónico es requerido';
                                   }
                                   if (!value.contains('@')) {
-                                    return 'Formato de correo inválido';
-                                  }
-                                  return null;
-                                },
-                              ),
-
-                              const SizedBox(height: 16),
-
-                              AccessibleTextField(
-                                controller: _passwordController,
-                                labelText: localizations.password,
-                                semanticLabel: 'Campo de contraseña',
-                                obscureText: _isObscured,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'La contraseña es requerida';
-                                  }
-                                  return null;
-                                },
-                              ),
-
-                              const SizedBox(height: 8),
-
-                              // Checkbox para mostrar/ocultar contraseña
-                              Row(
-                                children: [
-                                  Checkbox(
-                                    value: !_isObscured,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _isObscured = !value!;
-                                      });
-                                      ref
-                                          .read(accessibilityProviderNotifier)
-                                          .provideSelectionFeedback();
-                                    },
-                                  ),
-                                  Text('Mostrar contraseña'),
-                                ],
-                              ),
-
-                              const SizedBox(height: 24),
-
-                              // Botón de login
-                              SizedBox(
-                                width: double.infinity,
-                                height: ScreenSize.responsiveButtonHeight(
-                                  context,
-                                ),
-                                child: AccessibleButton(
-                                  onPressed: _isLoading ? null : _login,
-                                  semanticLabel: localizations.loginButton,
-                                  child: _isLoading
-                                      ? const LoadingDots(color: Colors.white)
-                                      : Text(
-                                          localizations.loginButton,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 30),
-
-                      // Enlaces adicionales
-                      AnimatedCard(
-                        delay: const Duration(milliseconds: 500),
-                        child: Column(
-                          children: [
-                            TextButton(
-                              onPressed: () => context.push('/register'),
-                              child: Text('Crear cuenta nueva'),
-                            ),
-                            TextButton(
-                              onPressed: () => context.push('/settings'),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.settings, size: 16),
-                                  const SizedBox(width: 4),
-                                  Text(localizations.settings),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // Botones de prueba (solo en debug)
-                      if (kDebugMode) ...[
-                        AnimatedCard(
-                          delay: const Duration(milliseconds: 600),
-                          child: _buildTestButtons(context, localizations),
-                        ),
-                      ],
-                    ],
                   ),
                 ),
               ),

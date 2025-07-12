@@ -54,183 +54,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       final success = await authNotifier.login(
         _emailController.text.trim(),
         _passwordController.text,
-      );
-
-      if (mounted) {
-        if (success) {
-          print('LoginScreen: Login successful, navigating to home');
-          context.go('/home');
-        } else {
-          print('LoginScreen: Login failed');
-          final authState = ref.read(authProvider);
-          final errorMessage = authState.error ?? 'Error al iniciar sesión. Verifica tus credenciales.';
-          
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(errorMessage),
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 5),
-              action: SnackBarAction(
-                label: 'Probar Conexión',
-                textColor: Colors.white,
                 onPressed: _testConnection,
               ),
             ),
           );
-        }
-      }
-    } catch (e) {
-      print('LoginScreen: Exception during login: \$e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('❌ Error de Login'),
-                const SizedBox(height: 4),
                 Text('Detalles: \${e.toString()}', style: const TextStyle(fontSize: 12)),
                 const SizedBox(height: 8),
                 const Text('💡 Verifica:', style: TextStyle(fontWeight: FontWeight.bold)),
                 const Text('• Conexión a internet\\n• Credenciales correctas\\n• Estado del servidor', 
-                  style: TextStyle(fontSize: 12)),
-              ],
-            ),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 8),
-            action: SnackBarAction(
-              label: 'Test Conexión',
-              textColor: Colors.white,
-              onPressed: _testConnection,
-            ),
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
-  Future<void> _testConnection() async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const AlertDialog(
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
+// Eliminado: test de conexión, configuración y usuarios de prueba
             Text('Probando conexión...'),
             SizedBox(height: 8),
             Text('Esto puede tardar 30-60 segundos', style: TextStyle(fontSize: 12, color: Colors.grey)),
           ],
         ),
       ),
-    );
+    )
 
     try {
       final dio = Dio();
       dio.options.connectTimeout = const Duration(seconds: 60);
       dio.options.receiveTimeout = const Duration(seconds: 60);
       dio.options.sendTimeout = const Duration(seconds: 60);
-      
-      dio.options.headers = {
-        'User-Agent': 'GestionPedidos-Mobile/1.0',
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      };
-      
-      print('Testing connection to: \${ApiConstants.baseUrl}/health');
-      final stopwatch = Stopwatch()..start();
-      
-      final response = await dio.get('\${ApiConstants.baseUrl}/health');
-      
-      stopwatch.stop();
-      Navigator.of(context).pop();
-      
-      if (response.statusCode == 200) {
-        _showResult('✅ Conexión Exitosa', 
-          'Backend respondió en \${stopwatch.elapsedMilliseconds}ms\\n\\n\${response.data}\\n\\n• Estado: FUNCIONANDO\\n• Latencia: \${stopwatch.elapsedMilliseconds}ms\\n• Servidor: Render.com', Colors.green);
-      } else {
-        _showResult('⚠️ Respuesta Inesperada', 
-          'Status HTTP: \${response.statusCode}\\nTiempo: \${stopwatch.elapsedMilliseconds}ms', Colors.orange);
-      }
-    } catch (e) {
-      Navigator.of(context).pop();
-      print('Connection error details: \$e');
-      
-      String errorMessage;
-      String troubleshooting = '';
-      
-      if (e.toString().contains('timeout') || e.toString().contains('SocketException')) {
-        errorMessage = '⏰ TIMEOUT DE CONEXIÓN';
-        troubleshooting = '''🔄 COLD START DE RENDER DETECTADO
-
-Render pone el servidor en "sleep" después de inactividad.
-La primera conexión puede tardar 30-60 segundos.
-
-✅ SOLUCIONES:
-• Espera 1-2 minutos y vuelve a intentar
-• El servidor está "despertando"
-• Esto es completamente normal
-
-🌐 VERIFICACIONES ADICIONALES:
-• Confirma que tienes internet
-• Prueba cambiar de WiFi a datos móviles
-• Verifica que no haya restricciones de firewall''';
-      } else if (e.toString().contains('network') || e.toString().contains('connection') || e.toString().contains('resolve')) {
-        errorMessage = '🌐 ERROR DE RED';
-        troubleshooting = '''❌ PROBLEMA DE CONECTIVIDAD
-
-🔍 DIAGNÓSTICO:
-• Tu dispositivo no puede alcanzar el servidor
-• Puede ser problema de DNS o firewall
-
-✅ SOLUCIONES:
-• Cambia de WiFi a datos móviles (o viceversa)
-• Verifica que tengas internet funcional
-• Prueba abrir https://google.com en tu navegador
-• Reinicia tu conexión de red
-• Contacta a tu proveedor de internet si persiste''';
-      } else {
-        errorMessage = '❌ ERROR DESCONOCIDO';
-        troubleshooting = '''🔍 DETALLES TÉCNICOS:
-\${e.toString()}
-
-✅ SOLUCIONES GENERALES:
-• Reinicia la aplicación
-• Verifica tu conexión a internet
-• Prueba con datos móviles
-• Contacta soporte si persiste''';
-      }
-      
-      _showResult(errorMessage, troubleshooting, Colors.red);
-    }
-  }
-
-  void _showResult(String title, String message, Color color) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title, style: TextStyle(color: color, fontSize: 18, fontWeight: FontWeight.bold)),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(message, style: const TextStyle(fontSize: 14)),
-              const SizedBox(height: 20),
-              const Divider(),
-              const SizedBox(height: 10),
-              const Text('🔧 Información Técnica:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
+  // Eliminado: función de test de conexión y textos relacionados
                   color: Colors.grey[100],
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -246,7 +92,8 @@ La primera conexión puede tardar 30-60 segundos.
                 ),
               ),
               const SizedBox(height: 16),
-              if (color == Colors.red) ...[
+              if (color == Colors.red) {
+                [
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -264,7 +111,8 @@ La primera conexión puede tardar 30-60 segundos.
                     ],
                   ),
                 ),
-              ],
+              ]
+              },
             ],
           ),
         ),
@@ -284,7 +132,7 @@ La primera conexión puede tardar 30-60 segundos.
             ),
         ],
       ),
-    );
+    )
   }
 
   @override

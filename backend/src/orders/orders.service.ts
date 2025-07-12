@@ -37,57 +37,59 @@ export class OrdersService {
     }
 
     // Crear la orden en una transacción
-    return this.prisma.$transaction(async (prisma) => {
-      // Crear la orden
-      const order = await prisma.order.create({
+    // Crear la orden y los detalles en una transacción con timeout aumentado
+    const order = await this.prisma.$transaction(async (prisma) => {
+      const createdOrder = await prisma.order.create({
         data: {
           userId,
           total,
         },
       });
 
-      // Crear los detalles de la orden
       await prisma.orderItem.createMany({
         data: orderDetails.map(detail => ({
-          orderId: order.id,
+          orderId: createdOrder.id,
           productId: detail.productId,
           quantity: detail.quantity,
           price: detail.price,
         })),
       });
 
-      // Actualizar el stock de los productos
-      for (const detail of createOrderDto.orderItems) {
-        await this.productsService.updateStock(detail.productId, detail.quantity);
-      }
+      // Retornar solo el id para usar fuera de la transacción
+      return createdOrder.id;
+    }, { timeout: 15000 }); // 15 segundos
 
-      // Retornar la orden completa
-      return prisma.order.findUnique({
-        where: { id: order.id },
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              phone: true,
-              address: true,
-            },
+    // Actualizar el stock de los productos fuera de la transacción
+    for (const detail of createOrderDto.orderItems) {
+      await this.productsService.updateStock(detail.productId, detail.quantity);
+    }
+
+    // Retornar la orden completa
+    return this.prisma.order.findUnique({
+      where: { id: order },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+            address: true,
           },
-          orderItems: {
-            include: {
-              product: {
-                select: {
-                  id: true,
-                  name: true,
-                  price: true,
-                  imageUrl: true,
-                },
+        },
+        orderItems: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+                price: true,
+                imageUrl: true,
               },
             },
           },
         },
-      });
+      },
     });
   }
 

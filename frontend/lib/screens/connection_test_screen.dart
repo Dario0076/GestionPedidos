@@ -144,8 +144,9 @@ class _ConnectionTestScreenState extends ConsumerState<ConnectionTestScreen> {
                           Color? textColor;
                           if (result.startsWith('✅')) textColor = Colors.green;
                           if (result.startsWith('❌')) textColor = Colors.red;
-                          if (result.startsWith('🟡'))
+                          if (result.startsWith('🟡')) {
                             textColor = Colors.orange;
+                          }
 
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 4.0),

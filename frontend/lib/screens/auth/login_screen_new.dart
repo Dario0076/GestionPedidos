@@ -17,7 +17,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _isObscured = true;
+  final bool _isObscured = true;
   bool _isLoading = false;
 
   @override
@@ -68,86 +68,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _testConnection() async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const AlertDialog(
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Probando conexión...'),
-            SizedBox(height: 8),
-            Text('Esto puede tardar 30-60 segundos', style: TextStyle(fontSize: 12, color: Colors.grey)),
-          ],
-        ),
-      ),
-    );
-
-    try {
-      final dio = Dio();
-      dio.options.connectTimeout = const Duration(seconds: 60);
-      dio.options.receiveTimeout = const Duration(seconds: 60);
-      dio.options.sendTimeout = const Duration(seconds: 60);
-      
-      dio.options.headers = {
-        'User-Agent': 'GestionPedidos-Mobile/1.0',
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      };
-      
-      print('Testing connection to: ${ApiConstants.baseUrl}/health');
-      final stopwatch = Stopwatch()..start();
-      
-      final response = await dio.get('${ApiConstants.baseUrl}/health');
-      
-      stopwatch.stop();
-      Navigator.of(context).pop();
-      
-      if (response.statusCode == 200) {
-        _showResult('✅ Conexión Exitosa', 
-          'Backend respondió en ${stopwatch.elapsedMilliseconds}ms\n\n${response.data}\n\n• Estado: FUNCIONANDO\n• Latencia: ${stopwatch.elapsedMilliseconds}ms\n• Servidor: Render.com', Colors.green);
-      } else {
-        _showResult('⚠️ Respuesta Inesperada', 
-          'Status HTTP: ${response.statusCode}\nTiempo: ${stopwatch.elapsedMilliseconds}ms', Colors.orange);
-      }
-    } catch (e) {
-      Navigator.of(context).pop();
-      print('Connection error details: $e');
-      
-      String errorMessage;
-      String troubleshooting = '';
-      
-      if (e.toString().contains('timeout') || e.toString().contains('SocketException')) {
-        errorMessage = '⏰ TIMEOUT DE CONEXIÓN';
-        troubleshooting = '''🔄 COLD START DE RENDER DETECTADO
-
-Render pone el servidor en "sleep" después de inactividad.
-La primera conexión puede tardar 30-60 segundos.
-
-✅ SOLUCIONES:
-• Espera 1-2 minutos y vuelve a intentar
-• El servidor está "despertando"
-• Esto es completamente normal
-
-🌐 VERIFICACIONES ADICIONALES:
-• Confirma que tienes internet
-• Prueba cambiar de WiFi a datos móviles
-• Verifica que no haya restricciones de firewall''';
-      } else if (e.toString().contains('network') || e.toString().contains('connection') || e.toString().contains('resolve')) {
-        errorMessage = '🌐 ERROR DE RED';
-        troubleshooting = '''❌ PROBLEMA DE CONECTIVIDAD
-
-🔍 DIAGNÓSTICO:
-• Tu dispositivo no puede alcanzar el servidor
-• Puede ser problema de DNS o firewall
-
-✅ SOLUCIONES:
-• Cambia de WiFi a datos móviles (o viceversa)
-• Verifica que tengas internet funcional
-• Prueba abrir https://google.com en tu navegador
-• Reinicia tu conexión de red
+  // Eliminado: función de test de conexión y textos relacionados
 • Contacta a tu proveedor de internet si persiste''';
       } else if (e.toString().contains('certificate') || e.toString().contains('handshake')) {
         errorMessage = '🔒 ERROR DE CERTIFICADO SSL';

@@ -24,7 +24,7 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
     'PREPARING',
     'SHIPPED',
     'DELIVERED',
-    'CANCELLED'
+    'CANCELLED',
   ];
 
   final Map<String, String> statusLabels = {
@@ -34,7 +34,7 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
     'PREPARING': 'Preparando',
     'SHIPPED': 'Enviado',
     'DELIVERED': 'Entregado',
-    'CANCELLED': 'Cancelado'
+    'CANCELLED': 'Cancelado',
   };
 
   final Map<String, Color> statusColors = {
@@ -61,11 +61,11 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
 
       final apiService = ApiService();
       final response = await apiService.get('/orders');
-      
+
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
         orders = data.map((json) => Order.fromJson(json)).toList();
-        
+
         // Ordenar por fecha de creación (más recientes primero)
         orders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       } else {
@@ -83,7 +83,9 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
 
   List<Order> get filteredOrders {
     if (selectedStatus == 'ALL') return orders;
-    return orders.where((order) => order.status.value == selectedStatus).toList();
+    return orders
+        .where((order) => order.status.value == selectedStatus)
+        .toList();
   }
 
   @override
@@ -95,10 +97,7 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
         elevation: 1,
         title: const Text(
           'Gestionar Pedidos',
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black87),
@@ -118,8 +117,8 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : error != null
-                    ? _buildErrorState(context)
-                    : _buildOrdersList(context),
+                ? _buildErrorState(context)
+                : _buildOrdersList(context),
           ),
         ],
       ),
@@ -135,10 +134,7 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
         children: [
           const Text(
             'Filtrar por estado:',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
           SingleChildScrollView(
@@ -173,11 +169,7 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.error_outline,
-            size: 64,
-            color: Colors.red,
-          ),
+          const Icon(Icons.error_outline, size: 64, color: Colors.red),
           const SizedBox(height: 16),
           Text(
             error!,
@@ -196,20 +188,16 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
 
   Widget _buildOrdersList(BuildContext context) {
     final filtered = filteredOrders;
-    
+
     if (filtered.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.assignment_outlined,
-              size: 64,
-              color: Colors.grey,
-            ),
+            const Icon(Icons.assignment_outlined, size: 64, color: Colors.grey),
             const SizedBox(height: 16),
             Text(
-              selectedStatus == 'ALL' 
+              selectedStatus == 'ALL'
                   ? 'No hay pedidos registrados'
                   : 'No hay pedidos con estado ${statusLabels[selectedStatus]}',
               style: const TextStyle(fontSize: 16, color: Colors.grey),
@@ -236,9 +224,7 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -255,7 +241,10 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
                 ),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: statusColors[order.status.value]?.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -278,10 +267,7 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
                 const SizedBox(width: 4),
                 Text(
                   'Usuario ID: ${order.userId}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
                 const Spacer(),
                 Text(
@@ -301,10 +287,7 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
                 const SizedBox(width: 4),
                 Text(
                   'Creado: ${_formatDate(order.createdAt)}',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -312,34 +295,34 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
               const SizedBox(height: 12),
               const Text(
                 'Productos:',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 4),
-              ...order.orderDetails.map((item) => Padding(
-                padding: const EdgeInsets.only(left: 16, top: 4),
-                child: Row(
-                  children: [
-                    Text(
-                      '• ${item.product?.name ?? 'Producto N/A'}',
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                    const Spacer(),
-                    Text(
-                      '${item.quantity}x \$${item.price.toStringAsFixed(2)}',
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ],
+              ...order.orderDetails.map(
+                (item) => Padding(
+                  padding: const EdgeInsets.only(left: 16, top: 4),
+                  child: Row(
+                    children: [
+                      Text(
+                        '• ${item.product?.name ?? 'Producto N/A'}',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      const Spacer(),
+                      Text(
+                        '${item.quantity}x \$${item.price.toStringAsFixed(2)}',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
                 ),
-              )),
+              ),
             ],
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                if (order.status.value != 'CANCELLED' && order.status.value != 'DELIVERED')
+                if (order.status.value != 'CANCELLED' &&
+                    order.status.value != 'DELIVERED')
                   TextButton.icon(
                     onPressed: () => _showUpdateStatusDialog(context, order),
                     icon: const Icon(Icons.update, size: 16),
@@ -365,7 +348,7 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
 
   void _showUpdateStatusDialog(BuildContext context, Order order) {
     String newStatus = order.status.value;
-    
+
     // Determinar los estados disponibles según el estado actual
     List<String> availableStatuses = [];
     switch (order.status.value) {
@@ -387,7 +370,9 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
 
     if (availableStatuses.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No hay estados disponibles para actualizar')),
+        const SnackBar(
+          content: Text('No hay estados disponibles para actualizar'),
+        ),
       );
       return;
     }
@@ -405,10 +390,10 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
             const Text('Nuevo estado:'),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              value: availableStatuses.contains(newStatus) ? newStatus : availableStatuses.first,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-              ),
+              value: availableStatuses.contains(newStatus)
+                  ? newStatus
+                  : availableStatuses.first,
+              decoration: const InputDecoration(border: OutlineInputBorder()),
               items: availableStatuses.map((status) {
                 return DropdownMenuItem(
                   value: status,
@@ -435,15 +420,23 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
     );
   }
 
-  Future<void> _updateOrderStatus(BuildContext context, Order order, String newStatus) async {
+  Future<void> _updateOrderStatus(
+    BuildContext context,
+    Order order,
+    String newStatus,
+  ) async {
     try {
       final apiService = ApiService();
-      await apiService.patch('/orders/${order.id}', data: {'status': newStatus});
-      
+      await apiService.patch(
+        '/orders/${order.id}/status',
+        data: {'status': newStatus},
+      );
       if (context.mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Estado actualizado a ${statusLabels[newStatus]}')),
+          SnackBar(
+            content: Text('Estado actualizado a ${statusLabels[newStatus]}'),
+          ),
         );
         _loadOrders();
       }
@@ -473,32 +466,44 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
               _buildDetailRow('Estado', order.status.displayName),
               _buildDetailRow('Usuario ID', order.userId.toString()),
               _buildDetailRow('Total', '\$${order.total.toStringAsFixed(2)}'),
-              _buildDetailRow('Fecha de creación', _formatDate(order.createdAt)),
-              _buildDetailRow('Última actualización', _formatDate(order.updatedAt)),
+              _buildDetailRow(
+                'Fecha de creación',
+                _formatDate(order.createdAt),
+              ),
+              _buildDetailRow(
+                'Última actualización',
+                _formatDate(order.updatedAt),
+              ),
               const SizedBox(height: 16),
               const Text(
                 'Productos:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              ...order.orderDetails.map((item) => Card(
-                margin: const EdgeInsets.only(bottom: 8),
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.product?.name ?? 'Producto N/A',
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      Text('Cantidad: ${item.quantity}'),
-                      Text('Precio unitario: \$${item.price.toStringAsFixed(2)}'),
-                      Text('Subtotal: \$${(item.quantity * item.price).toStringAsFixed(2)}'),
-                    ],
+              ...order.orderDetails.map(
+                (item) => Card(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.product?.name ?? 'Producto N/A',
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        Text('Cantidad: ${item.quantity}'),
+                        Text(
+                          'Precio unitario: \$${item.price.toStringAsFixed(2)}',
+                        ),
+                        Text(
+                          'Subtotal: \$${(item.quantity * item.price).toStringAsFixed(2)}',
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              )),
+              ),
             ],
           ),
         ),

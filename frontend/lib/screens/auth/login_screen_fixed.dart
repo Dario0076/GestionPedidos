@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:dio/dio.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/connection_status_widget.dart';
 import '../../utils/constants.dart';
@@ -45,7 +44,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Error al iniciar sesión. Verifica tus credenciales.'),
+              content: Text(
+                'Error al iniciar sesión. Verifica tus credenciales.',
+              ),
               backgroundColor: Colors.red,
             ),
           );
@@ -68,52 +69,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _testConnection() async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const AlertDialog(
-        content: Row(
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 16),
-            Text('Probando conexión...'),
-          ],
-        ),
-      ),
-    );
-
-    try {
-      final dio = Dio();
-      dio.options.connectTimeout = const Duration(seconds: 30);
-      dio.options.receiveTimeout = const Duration(seconds: 30);
-      
-      print('Testing: ${ApiConstants.baseUrl}/health');
-      final response = await dio.get('${ApiConstants.baseUrl}/health');
-      
-      Navigator.of(context).pop();
-      
-      if (response.statusCode == 200) {
-        _showResult('✅ Conexión Exitosa', 
-          'El backend respondió correctamente:\n\n${response.data}\n\nLa API está funcionando bien.', Colors.green);
-      } else {
-        _showResult('⚠️ Respuesta Inesperada', 
-          'Status HTTP: ${response.statusCode}', Colors.orange);
-      }
-    } catch (e) {
-      Navigator.of(context).pop();
-      print('Connection error: $e');
-      
-      String errorMessage;
-      if (e.toString().contains('timeout') || e.toString().contains('SocketException')) {
-        errorMessage = '⏰ TIMEOUT - Cold Start de Render\n\nEsto es normal la primera vez. El servidor necesita "despertar".\n\n• Espera 30-60 segundos\n• Inténtalo de nuevo\n• Verifica tu internet';
-      } else if (e.toString().contains('network') || e.toString().contains('connection')) {
-        errorMessage = '🌐 ERROR DE RED\n\n• Verifica tu conexión WiFi\n• Prueba con datos móviles\n• Verifica que no haya firewall';
-      } else {
-        errorMessage = 'ERROR: ${e.toString()}';
-      }
-      
-      _showResult('❌ Error de Conexión', errorMessage, Colors.red);
-    }
+    // Eliminado: función de test de conexión y textos relacionados
   }
 
   void _showResult(String title, String message, Color color) {
@@ -129,15 +85,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             const SizedBox(height: 20),
             const Divider(),
             const SizedBox(height: 10),
-            const Text('Configuración:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text(
+              'Configuración:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 5),
-            Text('API URL:', style: const TextStyle(fontSize: 12, color: Colors.grey)),
-            Text(ApiConstants.baseUrl, 
-              style: const TextStyle(fontSize: 11, color: Colors.blue, fontFamily: 'monospace')),
+            Text(
+              'API URL:',
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            Text(
+              ApiConstants.baseUrl,
+              style: const TextStyle(
+                fontSize: 11,
+                color: Colors.blue,
+                fontFamily: 'monospace',
+              ),
+            ),
             const SizedBox(height: 10),
-            const Text('Si persiste el error:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-            const Text('• Verifica internet\n• Espera y reinténtalo\n• El servidor puede estar iniciando', 
-              style: TextStyle(fontSize: 11, color: Colors.grey)),
+            const Text(
+              'Si persiste el error:',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            ),
+            const Text(
+              '• Verifica internet\n• Espera y reinténtalo\n• El servidor puede estar iniciando',
+              style: TextStyle(fontSize: 11, color: Colors.grey),
+            ),
           ],
         ),
         actions: [
@@ -168,16 +141,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 40),
-                
+
                 // Logo y título
                 Icon(
                   Icons.shopping_cart,
                   size: 80,
                   color: Theme.of(context).primaryColor,
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 Text(
                   'Gestión de Pedidos',
                   textAlign: TextAlign.center,
@@ -186,24 +159,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     color: Theme.of(context).primaryColor,
                   ),
                 ),
-                
+
                 const SizedBox(height: 8),
-                
+
                 Text(
                   'Inicia sesión para continuar',
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
                 ),
-                
+
                 const SizedBox(height: 40),
-                
+
                 // Widget de estado de conexión
                 const ConnectionStatusWidget(),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Formulario de login
                 Card(
                   elevation: 4,
@@ -235,9 +208,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               return null;
                             },
                           ),
-                          
+
                           const SizedBox(height: 16),
-                          
+
                           // Campo de contraseña
                           TextFormField(
                             controller: _passwordController,
@@ -250,7 +223,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               prefixIcon: const Icon(Icons.lock_outlined),
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  _isObscured ? Icons.visibility : Icons.visibility_off,
+                                  _isObscured
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
                                 ),
                                 onPressed: () {
                                   setState(() {
@@ -270,9 +245,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               return null;
                             },
                           ),
-                          
+
                           const SizedBox(height: 24),
-                          
+
                           // Botón de login
                           SizedBox(
                             width: double.infinity,
@@ -293,7 +268,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                       width: 20,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Colors.white,
+                                            ),
                                       ),
                                     )
                                   : const Text(
@@ -310,9 +288,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Link a registro
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -330,62 +308,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Botón de test de conexión MÁS VISIBLE
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: _testConnection,
-                    icon: const Icon(Icons.network_check),
-                    label: const Text(
-                      'PROBAR CONEXIÓN A LA API',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-                
-                const SizedBox(height: 8),
-                
-                // Info de la API
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey[300]!),
-                  ),
-                  child: Column(
-                    children: [
-                      const Text(
-                        'Configuración de API:',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        ApiConstants.baseUrl,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 10,
-                          color: Colors.blue,
-                          fontFamily: 'monospace',
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Si hay errores, usa el botón de arriba para diagnóstico',
-                        style: TextStyle(fontSize: 10, color: Colors.grey),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
+                // ...el resto del login y registro...
               ],
             ),
           ),

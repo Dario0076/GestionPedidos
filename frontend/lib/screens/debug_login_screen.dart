@@ -30,12 +30,12 @@ class _DebugLoginScreenState extends State<DebugLoginScreen> {
 
     _addLog('🔍 Iniciando test de login...');
     _addLog('📧 Email: ${_emailController.text}');
-    _addLog('🔗 URL Base: ${ApiConstants.baseUrl}');
+    _addLog('🔗 URL Base: https://gestion-pedidos-backend.onrender.com');
 
     try {
       // Crear instancia de Dio simple
       final dio = Dio();
-      dio.options.baseUrl = ApiConstants.baseUrl;
+      dio.options.baseUrl = 'https://gestion-pedidos-backend.onrender.com';
       dio.options.connectTimeout = const Duration(seconds: 10);
       dio.options.receiveTimeout = const Duration(seconds: 10);
 
@@ -98,14 +98,16 @@ class _DebugLoginScreenState extends State<DebugLoginScreen> {
     });
 
     _addLog('🔍 Probando conectividad...');
-    _addLog('🔗 URL: ${ApiConstants.baseUrl}/health');
+    _addLog('🔗 URL: https://gestion-pedidos-backend.onrender.com/health');
 
     try {
       final dio = Dio();
       dio.options.connectTimeout = const Duration(seconds: 10);
       dio.options.receiveTimeout = const Duration(seconds: 10);
 
-      final response = await dio.get('${ApiConstants.baseUrl}/health');
+      final response = await dio.get(
+        'https://gestion-pedidos-backend.onrender.com/health',
+      );
 
       _addLog('✅ Conectividad OK: ${response.statusCode}');
       _addLog('📄 Respuesta: ${response.data}');

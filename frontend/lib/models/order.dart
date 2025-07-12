@@ -48,16 +48,22 @@ class Order {
 
   factory Order.fromJson(Map<String, dynamic> json) {
     return Order(
-      id: json['id'] as String,
-      orderDate: DateTime.parse(json['orderDate'] as String),
-      status: OrderStatus.fromString(json['status'] as String),
-      total: (json['total'] as num).toDouble(),
-      notes: json['notes'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-      userId: json['userId'] as String,
+      id: json['id'] as String? ?? '',
+      orderDate: DateTime.parse(
+        json['orderDate'] as String? ?? DateTime.now().toIso8601String(),
+      ),
+      status: OrderStatus.fromString(json['status'] as String? ?? 'PENDING'),
+      total: (json['total'] as num?)?.toDouble() ?? 0.0,
+      notes: json['notes'] as String? ?? '',
+      createdAt: DateTime.parse(
+        json['createdAt'] as String? ?? DateTime.now().toIso8601String(),
+      ),
+      updatedAt: DateTime.parse(
+        json['updatedAt'] as String? ?? DateTime.now().toIso8601String(),
+      ),
+      userId: json['userId'] as String? ?? '',
       user: json['user'] != null ? User.fromJson(json['user']) : null,
-      orderDetails: (json['orderDetails'] as List)
+      orderDetails: (json['orderDetails'] as List? ?? [])
           .map((detail) => OrderDetail.fromJson(detail))
           .toList(),
     );
@@ -151,7 +157,9 @@ class OrderDetail {
       subtotal: (json['subtotal'] as num).toDouble(),
       orderId: json['orderId'] as String,
       productId: json['productId'] as String,
-      product: json['product'] != null ? Product.fromJson(json['product']) : null,
+      product: json['product'] != null
+          ? Product.fromJson(json['product'])
+          : null,
     );
   }
 
@@ -204,17 +212,14 @@ class OrderDetail {
 
 // Clase para crear nuevos pedidos
 class CreateOrderRequest {
-  final List<OrderDetailRequest> orderDetails;
+  final List<OrderDetailRequest> orderItems;
   final String? notes;
 
-  const CreateOrderRequest({
-    required this.orderDetails,
-    this.notes,
-  });
+  const CreateOrderRequest({required this.orderItems, this.notes});
 
   Map<String, dynamic> toJson() {
     return {
-      'orderDetails': orderDetails.map((detail) => detail.toJson()).toList(),
+      'orderItems': orderItems.map((detail) => detail.toJson()).toList(),
       'notes': notes,
     };
   }
@@ -224,15 +229,9 @@ class OrderDetailRequest {
   final String productId;
   final int quantity;
 
-  const OrderDetailRequest({
-    required this.productId,
-    required this.quantity,
-  });
+  const OrderDetailRequest({required this.productId, required this.quantity});
 
   Map<String, dynamic> toJson() {
-    return {
-      'productId': productId,
-      'quantity': quantity,
-    };
+    return {'productId': productId, 'quantity': quantity};
   }
 }

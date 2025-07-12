@@ -10,7 +10,20 @@ export class OrdersController {
 
   @Post()
   create(@Request() req, @Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(req.user.userId, createOrderDto);
+    console.log('🛒 Orders Controller - Received create order request');
+    console.log('📋 User ID:', req.user.userId);
+    console.log('📦 Order DTO:', JSON.stringify(createOrderDto, null, 2));
+    console.log('📊 Order Items Count:', createOrderDto.orderItems?.length || 'undefined');
+
+    return this.ordersService.create(req.user.userId, createOrderDto)
+      .then((result) => {
+        console.log('✅ Respuesta enviada al frontend:', JSON.stringify(result, null, 2));
+        return result;
+      })
+      .catch((error) => {
+        console.error('❌ Error al crear pedido:', error);
+        throw error;
+      });
   }
 
   @Get()
@@ -30,7 +43,16 @@ export class OrdersController {
 
   @Patch(':id/status')
   updateStatus(@Param('id') id: string, @Body() updateOrderStatusDto: UpdateOrderStatusDto) {
-    return this.ordersService.updateStatus(id, updateOrderStatusDto);
+    console.log('🔄 Actualizar estado pedido - ID recibido:', id);
+    return this.ordersService.findOne(id)
+      .then(order => {
+        console.log('🔍 Resultado búsqueda pedido:', order ? JSON.stringify(order, null, 2) : 'Pedido no encontrado');
+        return this.ordersService.updateStatus(id, updateOrderStatusDto);
+      })
+      .catch(error => {
+        console.error('❌ Error al buscar pedido para actualizar estado:', error);
+        throw error;
+      });
   }
 
   @Patch(':id/cancel')
