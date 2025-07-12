@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: gestion-pedidos-api
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: npm run deploy
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        value: "your-super-secret-jwt-key-change-this-in-production-render-2024"
+      - key: JWT_EXPIRES_IN
+        value: "7d"

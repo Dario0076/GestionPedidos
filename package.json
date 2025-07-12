@@ -1,0 +1,27 @@
+{
+  "name": "gestion-pedidos",
+  "version": "1.0.0",
+  "description": "Sistema completo de gestión de pedidos con Flutter y NestJS",
+  "scripts": {
+    "setup-mobile": "powershell -ExecutionPolicy Bypass -File ./setup-mobile.ps1",
+    "setup-emulator": "powershell -ExecutionPolicy Bypass -File ./setup-emulator.ps1",
+    "setup-online": "powershell -ExecutionPolicy Bypass -File ./setup-online.ps1",
+    "start-backend": "cd backend && npm run start:dev",
+    "start-presentation": "npm run setup-mobile && npm run start-backend",
+    "build-apk": "cd frontend && flutter build apk --release",
+    "doctor": "cd frontend && flutter doctor",
+    "test-connection": "curl http://localhost:3000/api/health"
+  },
+  "keywords": [
+    "flutter",
+    "nestjs",
+    "sqlite",
+    "jwt",
+    "api",
+    "mobile",
+    "ecommerce",
+    "orders"
+  ],
+  "author": "Tu Nombre",
+  "license": "MIT"
+}
