@@ -74,7 +74,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     String errorMessage = '';
     String troubleshooting = '';
     try {
-      final response = await Dio().get(ApiConstants.baseUrl + '/health');
+      final response = await Dio().get('${ApiConstants.baseUrl}/health');
       if (response.statusCode == 200) {
         _showResult(
           '✅ Conexión Exitosa',
