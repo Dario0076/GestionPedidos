@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/connection_status_widget.dart';
-import '../../utils/constants.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -68,67 +67,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
-  Future<void> _testConnection() async {
-    // Eliminado: función de test de conexión y textos relacionados
-  }
+  // ...existing code...
 
-  void _showResult(String title, String message, Color color) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title, style: TextStyle(color: color, fontSize: 18)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(message, style: const TextStyle(fontSize: 14)),
-            const SizedBox(height: 20),
-            const Divider(),
-            const SizedBox(height: 10),
-            const Text(
-              'Configuración:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              'API URL:',
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-            Text(
-              ApiConstants.baseUrl,
-              style: const TextStyle(
-                fontSize: 11,
-                color: Colors.blue,
-                fontFamily: 'monospace',
-              ),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              'Si persiste el error:',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-            ),
-            const Text(
-              '• Verifica internet\n• Espera y reinténtalo\n• El servidor puede estar iniciando',
-              style: TextStyle(fontSize: 11, color: Colors.grey),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cerrar'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _testConnection();
-            },
-            child: const Text('Reintentar'),
-          ),
-        ],
-      ),
-    );
-  }
+  // ...existing code...
 
   @override
   Widget build(BuildContext context) {
