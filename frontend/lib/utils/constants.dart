@@ -1,10 +1,8 @@
 class ApiConstants {
   // URL base de la API - Túnel de desarrollo para acceso público
-  static const String baseUrl = 'https://n6sj7k57-3000.brs.devtunnels.ms/api';
-
-  // Otras opciones (comentadas)
-  // static const String baseUrl = 'http://192.168.1.6:3000/api'; // Para dispositivo móvil en red local
-  // static const String baseUrl = 'http://10.0.2.2:3000/api'; // Para emulador Android
+  //static const String baseUrl = 'https://n6sj7k57-3000.brs.devtunnels.ms/api';
+  static const String baseUrl =
+      'http://10.0.2.2:3000/api'; // Para emulador Android
   // static const String baseUrl = 'https://backend-m4do.onrender.com/api'; // Render deployment
   // static const String baseUrl = 'http://localhost:3000/api'; // Desarrollo local
 
