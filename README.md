@@ -64,7 +64,7 @@ flutter run
 ```
 
 ### 4. Acceso
-- **Admin:** admin@test.com / admin123
+- **Admin:** admin@admin.com / admin123
 - **Usuario:** user@user.com / user123
 
 ### 5. Notas

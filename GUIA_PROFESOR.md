@@ -2,7 +2,6 @@
 
 ## 📋 Información del Proyecto
 
-**Estudiante**: [Tu Nombre]
 **Proyecto**: Sistema de Gestión de Pedidos
 **Backend**: NestJS con Prisma ORM
 **Base de Datos**: SQLite (desarrollo) / PostgreSQL (producción)

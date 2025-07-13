@@ -37,10 +37,10 @@ static const String baseUrl = 'https://backend-m4do.onrender.com/api';
 
 ## 🔧 Configuración Según Escenario
 
-### Escenario 1: Presentación con tu Laptop + Teléfono
+### Escenario 1: Presentación con tu emulador + Teléfono
 
 **Pasos:**
-1. Obtener IP de tu laptop:
+1. Obtener IP de tu dispositivo:
    ```bash
    ipconfig | findstr "IPv4"
    ```

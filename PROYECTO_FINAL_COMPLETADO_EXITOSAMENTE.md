@@ -18,7 +18,7 @@
 ## 🔑 CREDENCIALES DE ACCESO VERIFICADAS
 
 ### ✅ Administrador (VERIFICADO FUNCIONANDO)
-- **Email**: `admin@test.com`
+- **Email**: `admin@admin.com`
 - **Password**: `admin123`
 - **Rol**: ADMIN
 - **Estado**: ✅ LOGIN EXITOSO CONFIRMADO
