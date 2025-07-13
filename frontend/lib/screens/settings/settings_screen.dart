@@ -33,11 +33,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final themeState = ref.watch(themeProvider);
     final localizations = AppLocalizations(
       Localizations.localeOf(context).languageCode,
     );
-
     return ResponsiveSafeArea(
       child: Scaffold(
         appBar: AppBar(
