@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/locale_provider.dart';
-import '../../providers/accessibility_provider.dart';
 import '../../widgets/responsive_widgets.dart';
 import '../../utils/animations.dart';
 import '../../utils/app_localizations.dart';
@@ -48,7 +47,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             tabs: [
               Tab(icon: const Icon(Icons.palette), text: 'Tema'),
               Tab(icon: const Icon(Icons.language), text: 'Idioma'),
-              Tab(icon: const Icon(Icons.accessibility), text: 'Accesibilidad'),
             ],
           ),
         ),
@@ -57,7 +55,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           children: [
             _buildThemeSettings(context, localizations),
             _buildLanguageSettings(context, localizations),
-            _buildAccessibilitySettings(context, localizations),
           ],
         ),
       ),
@@ -336,117 +333,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
     );
   }
 
-  Widget _buildAccessibilitySettings(
-    BuildContext context,
-    AppLocalizations localizations,
-  ) {
-    return SingleChildScrollView(
-      child: ResponsivePadding(
-        child: Column(
-          children: [
-            AnimatedCard(
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        localizations.translate('accessibility'),
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 16),
-                      Consumer(
-                        builder: (context, ref, child) {
-                          final accessibilityProvider = ref.watch(
-                            accessibilityProviderNotifier,
-                          );
-
-                          return Column(
-                            children: [
-                              SwitchListTile(
-                                title: Text(
-                                  localizations.translate('high_contrast'),
-                                ),
-                                subtitle: Text(
-                                  localizations.translate('improve_visibility'),
-                                ),
-                                value: accessibilityProvider.useHighContrast,
-                                onChanged: (value) {
-                                  ref
-                                      .read(
-                                        accessibilityProviderNotifier.notifier,
-                                      )
-                                      .toggleHighContrast();
-                                },
-                              ),
-                              SwitchListTile(
-                                title: Text(
-                                  localizations.translate('vibration'),
-                                ),
-                                subtitle: Text(
-                                  localizations.translate('haptic_feedback'),
-                                ),
-                                value: accessibilityProvider.enableVibration,
-                                onChanged: (value) {
-                                  ref
-                                      .read(
-                                        accessibilityProviderNotifier.notifier,
-                                      )
-                                      .toggleVibration();
-                                },
-                              ),
-                              SwitchListTile(
-                                title: Text(localizations.translate('sounds')),
-                                subtitle: Text(
-                                  localizations.translate('system_sounds'),
-                                ),
-                                value: accessibilityProvider.enableSounds,
-                                onChanged: (value) {
-                                  ref
-                                      .read(
-                                        accessibilityProviderNotifier.notifier,
-                                      )
-                                      .toggleSounds();
-                                },
-                              ),
-                              const Divider(),
-                              ListTile(
-                                title: Text(
-                                  localizations.translate('text_scale'),
-                                ),
-                                subtitle: Slider(
-                                  value: accessibilityProvider.textScaleFactor,
-                                  min: 0.8,
-                                  max: 2.0,
-                                  divisions: 12,
-                                  label:
-                                      '${(accessibilityProvider.textScaleFactor * 100).round()}%',
-                                  onChanged: (value) {
-                                    ref
-                                        .read(
-                                          accessibilityProviderNotifier
-                                              .notifier,
-                                        )
-                                        .setTextScaleFactor(value);
-                                  },
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   String _getThemeModeLabel(AppThemeMode mode, AppLocalizations localizations) {
     switch (mode) {
       case AppThemeMode.light:
@@ -475,10 +361,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
 }
 
 // Providers para accessibility y locale
-final accessibilityProviderNotifier =
-    ChangeNotifierProvider<AccessibilityProvider>((ref) {
-      return AccessibilityProvider();
-    });
 
 final localeProviderNotifier = ChangeNotifierProvider<LocaleProvider>((ref) {
   return LocaleProvider();
