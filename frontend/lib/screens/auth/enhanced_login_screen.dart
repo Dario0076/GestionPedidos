@@ -1,19 +1,10 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
-import '../../providers/accessibility_provider.dart';
-import '../../widgets/connection_status_widget.dart';
 import '../../widgets/responsive_widgets.dart';
 import '../../utils/animations.dart';
 import '../../utils/app_localizations.dart';
-
-// Provider para accessibility
-final accessibilityProviderNotifier =
-    ChangeNotifierProvider<AccessibilityProvider>((ref) {
-      return AccessibilityProvider();
-    });
 
 class EnhancedLoginScreen extends ConsumerStatefulWidget {
   const EnhancedLoginScreen({super.key});
@@ -28,7 +19,7 @@ class _EnhancedLoginScreenState extends ConsumerState<EnhancedLoginScreen>
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final bool _isObscured = true;
+  bool _isObscured = true; // Usada en el campo de contraseña
   bool _isLoading = false;
 
   late AnimationController _animationController;
@@ -75,39 +66,21 @@ class _EnhancedLoginScreenState extends ConsumerState<EnhancedLoginScreen>
     try {
       final authNotifier = ref.read(authProvider.notifier);
 
-      // Primero intentar con el método simple
-      print('🔍 Login: Intentando con método simple');
-      bool success = await authNotifier.loginSimple(
+      final success = await authNotifier.login(
         _emailController.text.trim(),
         _passwordController.text,
       );
 
-      // Si el método simple falla, intentar con el método original
-      if (!success) {
-        print('🔍 Login: Método simple falló, intentando método original');
-        success = await authNotifier.login(
-          _emailController.text.trim(),
-          _passwordController.text,
-        );
-      }
-
       if (mounted) {
         if (success) {
-          // Agregar feedback háptico
-          ref.read(accessibilityProviderNotifier).provideMediumFeedback();
-          print('🔍 Login: Éxito, navegando a /home');
           context.go('/home');
         } else {
-          ref.read(accessibilityProviderNotifier).provideHeavyFeedback();
-          print('🔍 Login: Credenciales inválidas');
           _showErrorSnackBar('Credenciales inválidas');
         }
       }
-    } catch (e, stackTrace) {
-      print('🔍 Login: Excepción capturada: $e');
-      print('🔍 Login: Stack trace: $stackTrace');
+    } catch (e) {
+      print('Login: Excepción capturada: $e');
       if (mounted) {
-        ref.read(accessibilityProviderNotifier).provideHeavyFeedback();
         _showErrorSnackBar('Error de conexión: ${e.toString()}');
       }
     } finally {
@@ -126,10 +99,6 @@ class _EnhancedLoginScreenState extends ConsumerState<EnhancedLoginScreen>
         duration: const Duration(seconds: 4),
       ),
     );
-  }
-
-  void _fillTestData() {
-    // Eliminado: función de autollenado de datos de prueba
   }
 
   @override
@@ -190,7 +159,7 @@ class _EnhancedLoginScreenState extends ConsumerState<EnhancedLoginScreen>
                               style: Theme.of(context).textTheme.headlineMedium
                                   ?.copyWith(
                                     fontWeight: FontWeight.bold,
-                        // Eliminado: Widget de estado de conexión
+                                    // Eliminado: Widget de estado de conexión
                                     fontSize: ScreenSize.responsiveFontSize(
                                       context,
                                       mobile: 24,
@@ -213,136 +182,76 @@ class _EnhancedLoginScreenState extends ConsumerState<EnhancedLoginScreen>
 
                       const SizedBox(height: 40),
 
-                      // Eliminado: Widget de estado de conexión
-
                       const SizedBox(height: 24),
 
                       // Formulario de login animado
-                        // Eliminado: Botones de prueba (solo en debug)
-                          child: Column(
-                            children: [
-                              AccessibleTextField(
-                                controller: _emailController,
+                      Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            TextFormField(
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              decoration: InputDecoration(
                                 labelText: localizations.email,
-                                semanticLabel: 'Campo de correo electrónico',
-                                keyboardType: TextInputType.emailAddress,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'El correo electrónico es requerido';
-                                  }
-                                  if (!value.contains('@')) {
+                                prefixIcon: const Icon(Icons.email),
+                                border: const OutlineInputBorder(),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'El correo electrónico es requerido';
+                                }
+                                if (!value.contains('@')) {
+                                  return 'Correo inválido';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _passwordController,
+                              obscureText: _isObscured,
+                              decoration: InputDecoration(
+                                labelText: localizations.password,
+                                prefixIcon: const Icon(Icons.lock),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _isObscured
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _isObscured = !_isObscured;
+                                    });
+                                  },
+                                ),
+                                border: const OutlineInputBorder(),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'La contraseña es requerida';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 24),
+                            ElevatedButton(
+                              onPressed: _isLoading ? null : _login,
+                              child: _isLoading
+                                  ? const CircularProgressIndicator()
+                                  : const Text('Ingresar'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTestButtons(
-    BuildContext context,
-    AppLocalizations localizations,
-  ) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Herramientas de Desarrollo',
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _fillTestData,
-                    icon: const Icon(Icons.person, size: 16),
-                    label: const Text('Admin', style: TextStyle(fontSize: 12)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => context.push('/connection-test'),
-                    icon: const Icon(Icons.network_check, size: 16),
-                    label: const Text('Test', style: TextStyle(fontSize: 12)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => context.push('/debug-login'),
-                    icon: const Icon(Icons.bug_report, size: 16),
-                    label: const Text('Debug', style: TextStyle(fontSize: 12)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.blue[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.blue[200]!),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '👥 Usuarios de Prueba',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    '🔑 Administrador: admin@test.com / admin123',
-                    style: TextStyle(fontSize: 12),
-                  ),
-                  const Text(
-                    '👤 Usuario: user@user.com / user123',
-                    style: TextStyle(fontSize: 12),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: Colors.amber[100],
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: const Text(
-                      '💡 El servidor puede tardar 1-2 minutos en despertar',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ),
       ),
     );

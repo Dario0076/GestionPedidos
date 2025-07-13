@@ -17,7 +17,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final bool _isObscured = true;
   bool _isLoading = false;
 
   @override
@@ -45,7 +44,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Error al iniciar sesión. Verifica tus credenciales.'),
+              content: Text(
+                'Error al iniciar sesión. Verifica tus credenciales.',
+              ),
               backgroundColor: Colors.red,
             ),
           );
@@ -67,10 +68,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  bool _isObscured = true;
+
   Future<void> _testConnection() async {
-  // Eliminado: función de test de conexión y textos relacionados
-• Contacta a tu proveedor de internet si persiste''';
-      } else if (e.toString().contains('certificate') || e.toString().contains('handshake')) {
+    String errorMessage = '';
+    String troubleshooting = '';
+    try {
+      final response = await Dio().get(ApiConstants.baseUrl + '/health');
+      if (response.statusCode == 200) {
+        _showResult(
+          '✅ Conexión Exitosa',
+          'El servidor está disponible y responde correctamente.',
+          Colors.green,
+        );
+      } else {
+        errorMessage = '⚠️ Problema de conexión';
+        troubleshooting =
+            'El servidor respondió con código: ${response.statusCode}\n\n• Contacta a tu proveedor de internet si persiste.';
+        _showResult(errorMessage, troubleshooting, Colors.red);
+      }
+    } catch (e) {
+      if (e.toString().contains('certificate') ||
+          e.toString().contains('handshake')) {
         errorMessage = '🔒 ERROR DE CERTIFICADO SSL';
         troubleshooting = '''🛡️ PROBLEMA DE SEGURIDAD
 
@@ -82,7 +101,8 @@ El dispositivo no puede verificar el certificado SSL.
 • Prueba con una red diferente''';
       } else {
         errorMessage = '❌ ERROR DESCONOCIDO';
-        troubleshooting = '''🔍 DETALLES TÉCNICOS:
+        troubleshooting =
+            '''🔍 DETALLES TÉCNICOS:
 ${e.toString()}
 
 ✅ SOLUCIONES GENERALES:
@@ -91,7 +111,6 @@ ${e.toString()}
 • Prueba con datos móviles
 • Contacta soporte si persiste''';
       }
-      
       _showResult(errorMessage, troubleshooting, Colors.red);
     }
   }
@@ -100,7 +119,14 @@ ${e.toString()}
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(title, style: TextStyle(color: color, fontSize: 18, fontWeight: FontWeight.bold)),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: color,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -110,7 +136,10 @@ ${e.toString()}
               const SizedBox(height: 20),
               const Divider(),
               const SizedBox(height: 10),
-              const Text('🔧 Información Técnica:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const Text(
+                '🔧 Información Técnica:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.all(12),
@@ -121,11 +150,23 @@ ${e.toString()}
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('🌐 URL: ${ApiConstants.baseUrl}', style: const TextStyle(fontSize: 12, fontFamily: 'monospace')),
+                    Text(
+                      '🌐 URL: ${ApiConstants.baseUrl}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
                     const SizedBox(height: 4),
-                    Text('📱 Dispositivo: Android', style: const TextStyle(fontSize: 12)),
+                    Text(
+                      '📱 Dispositivo: Android',
+                      style: const TextStyle(fontSize: 12),
+                    ),
                     const SizedBox(height: 4),
-                    Text('⏰ Timestamp: ${DateTime.now().toString()}', style: const TextStyle(fontSize: 12)),
+                    Text(
+                      '⏰ Timestamp: ${DateTime.now().toString()}',
+                      style: const TextStyle(fontSize: 12),
+                    ),
                   ],
                 ),
               ),
@@ -141,10 +182,18 @@ ${e.toString()}
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('💡 CONSEJO IMPORTANTE:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.orange)),
+                      Text(
+                        '💡 CONSEJO IMPORTANTE:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orange,
+                        ),
+                      ),
                       SizedBox(height: 4),
-                      Text('Si este es tu primer intento, espera 1-2 minutos. Los servidores gratuitos de Render tardan en "despertar".', 
-                        style: TextStyle(fontSize: 12)),
+                      Text(
+                        'Si este es tu primer intento, espera 1-2 minutos. Los servidores gratuitos de Render tardan en "despertar".',
+                        style: TextStyle(fontSize: 12),
+                      ),
                     ],
                   ),
                 ),
@@ -164,7 +213,10 @@ ${e.toString()}
                 _testConnection();
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-              child: const Text('Reintentar', style: TextStyle(color: Colors.white)),
+              child: const Text(
+                'Reintentar',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
         ],
       ),
@@ -182,7 +234,7 @@ ${e.toString()}
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 40),
-                
+
                 // Logo y título
                 Icon(
                   Icons.shopping_cart,
@@ -241,8 +293,13 @@ ${e.toString()}
                           labelText: 'Contraseña',
                           prefixIcon: const Icon(Icons.lock),
                           suffixIcon: IconButton(
-                            icon: Icon(_isObscured ? Icons.visibility : Icons.visibility_off),
-                            onPressed: () => setState(() => _isObscured = !_isObscured),
+                            icon: Icon(
+                              _isObscured
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: () =>
+                                setState(() => _isObscured = !_isObscured),
                           ),
                           border: const OutlineInputBorder(),
                         ),
@@ -254,7 +311,7 @@ ${e.toString()}
                         },
                       ),
                       const SizedBox(height: 24),
-                      
+
                       // Botón de login
                       SizedBox(
                         width: double.infinity,
@@ -263,12 +320,15 @@ ${e.toString()}
                           onPressed: _isLoading ? null : _login,
                           child: _isLoading
                               ? const CircularProgressIndicator()
-                              : const Text('Iniciar Sesión', style: TextStyle(fontSize: 16)),
+                              : const Text(
+                                  'Iniciar Sesión',
+                                  style: TextStyle(fontSize: 16),
+                                ),
                         ),
                       ),
-                      
+
                       const SizedBox(height: 20),
-                      
+
                       // Botón de test de conexión - MEJORADO
                       SizedBox(
                         width: double.infinity,
@@ -284,7 +344,13 @@ ${e.toString()}
                             children: [
                               Icon(Icons.wifi_find, color: Colors.white),
                               SizedBox(width: 8),
-                              Text('Test de Conexión', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                              Text(
+                                'Test de Conexión',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -292,9 +358,9 @@ ${e.toString()}
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 40),
-                
+
                 // Información de usuarios de prueba
                 Container(
                   padding: const EdgeInsets.all(16),
@@ -308,14 +374,23 @@ ${e.toString()}
                     children: [
                       const Text(
                         '👥 Usuarios de Prueba',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
                       const SizedBox(height: 12),
-                      const Text('🔑 Administrador:', style: TextStyle(fontWeight: FontWeight.bold)),
+                      const Text(
+                        '🔑 Administrador:',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       const Text('Email: admin@admin.com'),
                       const Text('Password: admin123'),
                       const SizedBox(height: 8),
-                      const Text('👤 Usuario Regular:', style: TextStyle(fontWeight: FontWeight.bold)),
+                      const Text(
+                        '👤 Usuario Regular:',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       const Text('Email: user@user.com'),
                       const Text('Password: user123'),
                       const SizedBox(height: 12),
@@ -327,7 +402,10 @@ ${e.toString()}
                         ),
                         child: const Text(
                           '💡 Si es tu primera vez, usa el "Test de Conexión" primero. El servidor puede tardar 1-2 minutos en despertar.',
-                          style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontStyle: FontStyle.italic,
+                          ),
                         ),
                       ),
                     ],
