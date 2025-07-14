@@ -21,14 +21,13 @@ class AppAnimations {
       pageBuilder: (context, animation, secondaryAnimation) => page,
       transitionDuration: duration,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        final tween = Tween(begin: begin, end: Offset.zero)
-            .chain(CurveTween(curve: easeInOut));
+        final tween = Tween(
+          begin: begin,
+          end: Offset.zero,
+        ).chain(CurveTween(curve: easeInOut));
         final offsetAnimation = animation.drive(tween);
-        
-        return SlideTransition(
-          position: offsetAnimation,
-          child: child,
-        );
+
+        return SlideTransition(position: offsetAnimation, child: child);
       },
     );
   }
@@ -41,10 +40,7 @@ class AppAnimations {
       pageBuilder: (context, animation, secondaryAnimation) => page,
       transitionDuration: duration,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeTransition(
-          opacity: animation,
-          child: child,
-        );
+        return FadeTransition(opacity: animation, child: child);
       },
     );
   }
@@ -57,14 +53,13 @@ class AppAnimations {
       pageBuilder: (context, animation, secondaryAnimation) => page,
       transitionDuration: duration,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        final tween = Tween(begin: 0.0, end: 1.0)
-            .chain(CurveTween(curve: elasticOut));
+        final tween = Tween(
+          begin: 0.0,
+          end: 1.0,
+        ).chain(CurveTween(curve: elasticOut));
         final scaleAnimation = animation.drive(tween);
-        
-        return ScaleTransition(
-          scale: scaleAnimation,
-          child: child,
-        );
+
+        return ScaleTransition(scale: scaleAnimation, child: child);
       },
     );
   }
@@ -98,26 +93,17 @@ class _AnimatedCardState extends State<AnimatedCard>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: widget.duration,
-      vsync: this,
-    );
+    _controller = AnimationController(duration: widget.duration, vsync: this);
 
     _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: widget.curve,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: widget.curve));
 
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0.0, 0.1),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: widget.curve,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: widget.curve));
 
     // Start animation after delay
     Future.delayed(widget.delay, () {
@@ -137,10 +123,7 @@ class _AnimatedCardState extends State<AnimatedCard>
   Widget build(BuildContext context) {
     return FadeTransition(
       opacity: _fadeAnimation,
-      child: SlideTransition(
-        position: _slideAnimation,
-        child: widget.child,
-      ),
+      child: SlideTransition(position: _slideAnimation, child: widget.child),
     );
   }
 }
@@ -171,18 +154,12 @@ class _PulseAnimationState extends State<PulseAnimation>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: widget.duration,
-      vsync: this,
-    );
+    _controller = AnimationController(duration: widget.duration, vsync: this);
 
     _animation = Tween<double>(
       begin: widget.minScale,
       end: widget.maxScale,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
     _controller.repeat(reverse: true);
   }
@@ -195,10 +172,7 @@ class _PulseAnimationState extends State<PulseAnimation>
 
   @override
   Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: _animation,
-      child: widget.child,
-    );
+    return ScaleTransition(scale: _animation, child: widget.child);
   }
 }
 
@@ -229,16 +203,14 @@ class _LoadingDotsState extends State<LoadingDots>
     super.initState();
     _controllers = List.generate(
       3,
-      (index) => AnimationController(
-        duration: widget.duration,
-        vsync: this,
-      ),
+      (index) => AnimationController(duration: widget.duration, vsync: this),
     );
 
     _animations = _controllers.map((controller) {
-      return Tween<double>(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(parent: controller, curve: Curves.easeInOut),
-      );
+      return Tween<double>(
+        begin: 0.0,
+        end: 1.0,
+      ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOut));
     }).toList();
 
     // Start animations with delays
@@ -262,7 +234,7 @@ class _LoadingDotsState extends State<LoadingDots>
   @override
   Widget build(BuildContext context) {
     final color = widget.color ?? Theme.of(context).primaryColor;
-    
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: List.generate(3, (index) {
