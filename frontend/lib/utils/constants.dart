@@ -3,7 +3,7 @@ class ApiConstants {
   //static const String baseUrl = 'https://n6sj7k57-3000.brs.devtunnels.ms/api';
   //static const String baseUrl = 'http://10.0.2.2:3000/api'; // Para emulador Android
   static const String baseUrl =
-      'https://backend-m4do.onrender.com/api'; // Render deployment
+      'https://backend-m4do.onrender.com'; // Render deployment (compatible emulador y móvil)
   // static const String baseUrl = 'http://localhost:3000/api'; // Desarrollo local
 
   // Endpoints de autenticación
